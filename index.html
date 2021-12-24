@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mahmahmahjong</title>
+</head>
+<body>
+    I remember so little html it's funny.
+
+    <div id="hand">
+        <p>Hand is here:</p>
+    </div>
+
+    <input type="text" id='queryBox' placeholder="Enter query here">
+    <button onclick="sendQuery()">Send!</button>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:8082");
+
+        let id = window.crypto.getRandomValues(new Uint32Array(1))[0];
+
+        ws.addEventListener('open', () => {
+            ws.send(id);
+        });
+
+        ws.addEventListener('message', ({data}) => {
+            if (data.split(":")[0] == 'HAND') { // Display the hand on the page
+                let tag = document.createElement("p");
+                let text = document.createTextNode(data[1]);
+                tag.appendChild(text);
+                var element = document.getElementById("hand");
+                element.appendChild(tag);
+            } else {
+                console.log(data);
+            }
+        })
+
+        function sendQuery() {
+            ws.send('QUERY:' + document.getElementById("queryBox").value);
+            console.log('query sent!');
+            document.getElementById('queryBox').value = '';
+        }
+        
+        
+    </script>
+</body>
+</html>
