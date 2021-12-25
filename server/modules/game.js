@@ -41,19 +41,29 @@ class Game {
         // populate the hands
         this.players = [p0, p1, p2, p3];
         this.hands = {};
-        this.hands[p0] = [];
-        this.hands[p1] = [];
-        this.hands[p2] = [];
-        this.hands[p3] = [];
-
-        for (let i = 0; i < 4*12; i += 1) {
-            let index = Math.floor(Math.random() * this.deck.length);
-            let toAdd = this.deck[index]; // Grab element from the deck
-            this.deck.splice(index, 1);
-            this.hands[this.players[i%4]].push(toAdd);
+        for (let i = 0; i < 4; i += 1) {
+            this.hands[this.players[i%4]] = this.deck.slice(0, 12);
+            this.deck = this.deck.slice(12);
         }
 
     }
+
+    /** Draw the top tile */
+    drawTile(player_id) {
+        this.hands[player_id].push(this.deck[0]);
+        this.deck = this.deck.slice(1);
+    }
+
+    /** Drop the selected tile */
+    dropTile(player_id, tile) {
+        let hand = this.hands[player_id]
+        let index = hand.indexOf(tile);
+        if (index > -1) {
+            hand.splice(index, 1);
+        }
+    }
+
+    
 }
 
 export {
