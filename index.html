@@ -7,7 +7,7 @@
     <title>mahmahmahjong</title>
 </head>
 <body>
-    I remember so little html it's funny.
+    I remember so little html it's not even funny.
 
     <div id="hand">
         <p>Hand is here:</p>
@@ -28,7 +28,7 @@
         ws.addEventListener('message', ({data}) => {
             if (data.split(":")[0] == 'HAND') { // Display the hand on the page
                 let tag = document.createElement("p");
-                let text = document.createTextNode(data[1]);
+                let text = document.createTextNode(data.split(":")[1]);
                 tag.appendChild(text);
                 var element = document.getElementById("hand");
                 element.appendChild(tag);
@@ -38,7 +38,7 @@
         })
 
         function sendQuery() {
-            ws.send('QUERY:' + document.getElementById("queryBox").value);
+            ws.send(`QUERY:${document.getElementById("queryBox").value};${id}`);
             console.log('query sent!');
             document.getElementById('queryBox').value = '';
         }
