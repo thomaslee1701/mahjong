@@ -2,7 +2,7 @@
 const tiles = new Set(['d1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9', 
                 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9',
                 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9',
-                'we', 'ws', 'ww', 'wn',
+                'ew', 'sw', 'ww', 'nw',
                 'red', 'green', 'white']);
 const NUM_TILES = 136;
 
@@ -29,6 +29,8 @@ class Game {
     // p0,...,p3 are ids
     constructor(p0, p1, p2, p3) {
         // populate the deck
+        this.discard = []
+        this.lastDiscarded = null;
         this.deck = []
         tiles.forEach((tile)=>{
             this.deck.push(tile);
@@ -42,8 +44,8 @@ class Game {
         this.players = [p0, p1, p2, p3];
         this.hands = {};
         for (let i = 0; i < 4; i += 1) {
-            this.hands[this.players[i%4]] = this.deck.slice(0, 12);
-            this.deck = this.deck.slice(12);
+            this.hands[this.players[i%4]] = this.deck.slice(0, 13); // Draw 13 tiles
+            this.deck = this.deck.slice(13);
         }
 
     }
@@ -59,7 +61,10 @@ class Game {
         let hand = this.hands[player_id]
         let index = hand.indexOf(tile);
         if (index > -1) {
+            this.discard.push(this.lastDiscarded);
+            this.lastDiscarded = hand[index];
             hand.splice(index, 1);
+            
         }
     }
 
