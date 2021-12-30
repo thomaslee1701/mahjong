@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>mahmahmahjong</title>
 </head>
-<body>
+<body style="background-color:darkgrey">
     I remember so little html it's not even funny.
 
     <div id="hand">
@@ -27,11 +27,20 @@
 
         ws.addEventListener('message', ({data}) => {
             if (data.split(":")[0] == 'HAND') { // Display the hand on the page
-                let tag = document.createElement("p");
-                let text = document.createTextNode(data.split(":")[1]);
-                tag.appendChild(text);
-                var element = document.getElementById("hand");
+                let tag = document.createElement("div");
+                hand = data.split(":")[1].split(' '); // hand is the actual hand array
+                for (let i = 0; i < hand.length; i += 1) {
+                    let img = new Image(width=50, height=100);
+                    img.border='5px solid transparent';
+                    img.src = `./images/${hand[i]}.png`;
+                    tag.appendChild(img);
+                }
+                let element = document.getElementById("hand");
                 element.appendChild(tag);
+            } else if (data.split(":")[0] == 'YOURTURN') {
+                if (data.split(":")[1] == id) {
+                    ws.send(`QUERY:draw tile;${id}`);
+                }
             } else {
                 console.log(data);
             }
