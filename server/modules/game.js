@@ -43,8 +43,10 @@ class Game {
         // populate the hands
         this.players = [p0, p1, p2, p3];
         this.hands = {};
+        this.handsTable = {};
         for (let i = 0; i < 4; i += 1) {
             this.hands[this.players[i%4]] = this.deck.slice(0, 13); // Draw 13 tiles
+            this.handsTable[this.players[i%4]] = 
             this.deck = this.deck.slice(13);
         }
 
@@ -67,6 +69,8 @@ class Game {
             
         }
     }
+
+
 
     
 }
