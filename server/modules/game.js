@@ -1,3 +1,6 @@
+import { shuffleArray } from './utils.js'
+import { Player } from './player.js'
+
 // d: dots, b: bamboo, c: character
 const tiles = new Set(['d1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9', 
                 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9',
@@ -5,17 +8,6 @@ const tiles = new Set(['d1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9',
                 'ew', 'sw', 'ww', 'nw',
                 'red', 'green', 'white']);
 const NUM_TILES = 136;
-
-/* Randomize array in-place using Durstenfeld shuffle algorithm */
-// SOURCE: https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-function shuffleArray(array) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-}
 
 function handToString(hand) {
     let retString = "";
@@ -41,36 +33,38 @@ class Game {
         shuffleArray(this.deck);
 
         // populate the hands
-        this.players = [p0, p1, p2, p3];
-        this.hands = {};
-        this.handsTable = {};
+        this.players = [new Player(p0), new Player(p1), new Player(p2), new Player(p3)];
+        this.playerIds = [p0, p1, p2, p3];
         for (let i = 0; i < 4; i += 1) {
-            this.hands[this.players[i%4]] = this.deck.slice(0, 13); // Draw 13 tiles
-            this.handsTable[this.players[i%4]] = 
-            this.deck = this.deck.slice(13);
+            for (let k = 0; k < 13; k += 1) { // Draw 13 tiles
+                this.players[i%4].drawTile(this.deck[0]);
+                this.deck = this.deck.slice(1);
+            }
         }
-
     }
 
     /** Draw the top tile */
-    drawTile(player_id) {
-        this.hands[player_id].push(this.deck[0]);
+    drawTile(playerId) {
+        let index = this.playerIds.indexOf(playerId);
+        this.players[index].drawTile(this.deck[0]);
         this.deck = this.deck.slice(1);
     }
 
     /** Drop the selected tile */
-    dropTile(player_id, tile) {
-        let hand = this.hands[player_id]
-        let index = hand.indexOf(tile);
-        if (index > -1) {
+    dropTile(playerId, tile) {
+        let index = this.playerIds.indexOf(playerId);
+        if (this.players[index].dropTile(tile)) {
             this.discard.push(this.lastDiscarded);
-            this.lastDiscarded = hand[index];
-            hand.splice(index, 1);
-            
+            this.lastDiscarded = tile;
+            return true;
         }
+        return false;
+    }  
+
+    getHand(playerId) {
+        let index = this.playerIds.indexOf(playerId);
+        return handToString(this.players[index].hand);
     }
-
-
 
     
 }

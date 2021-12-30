@@ -75,7 +75,6 @@ class Player {
     }
 
     drawTile(tile) {
-        
         getTileInfo(tile, this.handTable)[0] += 1; // Add one to frequency
         if (honors.has(tile)) { // If the tile is an honor tile
             this.handTable['honor'][0] += 1; // Add 1 to the total number of honors
@@ -85,13 +84,13 @@ class Player {
         }
 
         this.hand.push(tile);
-        sort(hand);
+        sort(this.hand);
     }
 
     // Returns true when successful and false otherwise
     dropTile(tile) {
         let tileInfo = getTileInfo(tile, this.handTable);
-        
+
         if (tileInfo[0] == 0) { // There are none of that tile
             return false;
         }
@@ -107,6 +106,28 @@ class Player {
             this.handTable[suit][0] -= 1; // Add 1 to the total number of that suit
         }
 
+        let index = this.hand.indexOf(tile);
+        this.hand.splice(index, 1);   
+
         return true;
     }
+
+    getBambooCount() {
+        return this.handTable['b'][0];
+    }
+    getCharacterCount() {
+        return this.handTable['c'][0];
+    }
+    getDotsCount() {
+        return this.handTable['d'][0];
+    }
+    getHonorCount() {
+        return this.handTable['honor'][0];
+    }
+
+    
+}
+
+export {
+    Player
 }

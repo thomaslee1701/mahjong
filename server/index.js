@@ -28,9 +28,8 @@ let websocket_connections = [];
 /** 
  * Functions for queries
  */
-function sendHand(ws_connection, player_id) {
-    sort(game.hands[player_id]);
-    ws_connection.send('HAND:' + handToString(game.hands[player_id]));
+function sendHand(ws_connection, playerId) {
+    ws_connection.send('HAND:' + game.getHand(playerId));
 }
 
 
