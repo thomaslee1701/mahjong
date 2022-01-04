@@ -323,6 +323,7 @@ class Game {
 export {
     tiles,
     NUM_TILES,
+    countMelds,
     handToString,
     Game
 }
