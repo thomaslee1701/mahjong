@@ -59,15 +59,16 @@ wss.on('connection', ws => { //ws is a single connection
                 game.drawTile(player_id);
                 sendHand(ws, player_id);
             } else if (q.slice(0, 9) == 'drop tile') {
-                game.dropTile(player_id, q.slice(10)); // Get just the tile
-                sendHand(ws, player_id)
-                turnPlayer = (turnPlayer + 1)%4; // Dropping tile ends a player's turn
-                if (win) {
+                let success = game.dropTile(player_id, q.slice(10)); // Get just the tile
+                if (success) {
+                    sendHand(ws, player_id)
+                    turnPlayer = (turnPlayer + 1)%4; // Dropping tile ends a player's turn
+                    if (win) {
 
-                } else {
-                    websocket_connections[turnPlayer].send(`YOURTURN:${players[turnPlayer]}`); // Next player draws a tile
+                    } else {
+                        websocket_connections[turnPlayer].send(`YOURTURN:${players[turnPlayer]}`); // Next player draws a tile
+                    }
                 }
-                
             }
         } else {
             if (playerCount >= 4) {
