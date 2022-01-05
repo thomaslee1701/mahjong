@@ -33,7 +33,7 @@ function countMeldsHelper(arr, i) {
         }
     } else { // We know that arr[i] contains a number > 0
         if (arr[i] < 3) { // Not possible to be a pong
-            if (arr[i + 1] > 1 && arr[i + 2] > 1) {
+            if (arr[i + 1] >= 1 && arr[i + 2] >= 1) {
                 arr[i] -= 1;
                 arr[i+1] -= 1;
                 arr[i+2] -= 1;
@@ -44,13 +44,13 @@ function countMeldsHelper(arr, i) {
         } else {
             let withPong = [...arr];
             withPong[i] -= 3;
-            if (arr[i + 1] > 1 && arr[i + 2] > 1) { // Straight possible
+            if (arr[i + 1] >= 1 && arr[i + 2] >= 1) { // Straight possible
                 arr[i] -= 1;
                 arr[i+1] -= 1;
                 arr[i+2] -= 1;
                 return Math.max(1+countMeldsHelper(withPong, i), 1 + countMeldsHelper(arr, i)); // Do not increment, could be more straights
             } else {
-                return countMeldsHelper(arr, i+1);
+                return 1 + countMeldsHelper(withPong, i+1);
             }
         }
     }
@@ -63,6 +63,7 @@ function countMeldsHelper(arr, i) {
  * @param {String[]} arr 
  */
 function countMelds(arr) {
+    arr = [...arr]
     return countMeldsHelper(arr, 1);
 }
 
@@ -228,7 +229,7 @@ function checkGreatDragons(b, c, d, h) {
     if ((b[0] == 0) + (c[0] == 0) + (d[0] == 0) != 1) { // One suit
         return false;
     }
-    let arr = null;
+    arr = null;
     if (b[0]>0) { // the meld must be in here
         arr = b;
     } else if (c[0]>0) {
