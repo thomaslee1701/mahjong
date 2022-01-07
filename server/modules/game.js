@@ -178,17 +178,16 @@ function checkSmallWinds9(b, c, d, h) {
         arr = b;
     } else if (c[0]>0) {
         arr = c;
-    } else{
+    } else {
         arr = d;
     }
-    for (let i = 1; i <= 7; i += 1) {
-        if (arr[i] == 3 || (arr[i]==1 && arr[i+1] == 1 && arr[i+2])) { // There is a pong or a straight
-            return true;
-        }
-    }
-
-    return false; // Did not find it :(
+    let numMelds = countMelds(arr); // Must be one meld
+    return numMelds == 1;
 }
+
+/**
+ * CHECK THE DRAGONS
+ */
 
 function checkGreatDragons(b, c, d, h) { 
     // Things to check: Three dragon melds, one meld, one pair of eyes 
@@ -199,13 +198,13 @@ function checkGreatDragons(b, c, d, h) {
     /** Find eyes and remove them */
     let arr = null;
     if ((b[0]-2)%3 == 0) { // eyes are in here or no eyes at all
-        arr = b;
+        arr = [...b];
     } else if ((c[0]-2)%3 == 0) {
-        arr = c;
+        arr = [...c];
     } else if ((d[0]-2)%3 == 0) {
-        arr = d;
+        arr = [...d];
     } else {
-        arr = h;
+        arr = [...h];
     }
     let found = false;
     for (let i = 1; i < arr.length; i += 1) {
@@ -237,13 +236,280 @@ function checkGreatDragons(b, c, d, h) {
     } else{
         arr = d;
     }
-    for (let i = 1; i <= 7; i += 1) {
-        if (arr[i] == 3 || (arr[i]==1 && arr[i+1] == 1 && arr[i+2])) { // There is a pong or a straight
-            return true;
+    let numMelds = countMelds(arr); // Must be one meld
+    return numMelds == 1;
+}
+
+function checkSmallDragons(b, c, d, h) { 
+    // Things to check: Two dragon melds, two other melds, one pair of eyes 
+    if (!(h[1] == 3 && h[2] == 3 && h[3] == 2)) { // Check three dragon melds
+        return false;
+    }
+
+    /** Find eyes and remove them */
+    let arr = null;
+    if ((b[0]-2)%3 == 0) { // eyes are in here or no eyes at all
+        arr = [...b];
+    } else if ((c[0]-2)%3 == 0) {
+        arr = [...c];
+    } else if ((d[0]-2)%3 == 0) {
+        arr = [...d];
+    } else {
+        arr = [...h];
+    }
+    let found = false;
+    for (let i = 1; i < arr.length; i += 1) {
+        if (arr[i] == 2) {
+            found = true;
+            arr[0] -= 2;
+            arr[i] = 0; // REMOVE THE EYES!! Should only be one or two suits now.
+            break;
         }
     }
-    
+    if (!found) { // If unable to find the eyes
+        return false;
+    }
+
+    let otherMelds = 2; // Need two other melds
+    otherMelds -= (h[4] == 3) + (h[5] == 3) + (h[6] == 3) + (h[7] == 3); // If there are wind melds...
+
+    // Non-wind melds
+    if ((b[0] == 0) + (c[0] == 0) + (d[0] == 0) == 3) { // Three suits is impossible
+        return false;
+    }
+    if (b[0]>0) { // the meld must be in here
+        otherMelds -= countMelds(b);
+    } 
+    if (c[0]>0) {
+        otherMelds -= countMelds(c);
+    } 
+    if (d[0]>0) {
+        otherMelds -= countMelds(d);
+    }
+    return otherMelds == 0; // Found the two other melds
+}
+
+function checkAllOneSuit(b, c, d, h) {
+    let arr = null;
+    if (b[0]==14) {
+        arr = [...b];
+    } else if (c[0] == 14) {
+        arr = [...c];
+    } else if (d[0] == 14) {
+        arr = [...d];
+    }
+    if (arr != null) {
+        return false;
+    }
+
+    let possibleEyes = [] // Possible places for eyes;
+    for (let i = 0; i < arr.length; i += 1) {
+        if (i >= 2) {
+            possibleEyes.push(i);
+        }
+    }
+
+    for (let k = 0; k < possibleEyes.length; k += 1) { // For each eye
+        let eye = possibleEyes[k];
+        arr[eye] -= 2; // Remove the eyes
+        if (countMelds(arr) == 4) {
+            return true;
+        }
+        arr[eye] += 2; // Return the eyes
+    }
     return false;
+}
+
+function checkMixedOneSuit(b, c, d, h) {
+    let arr = null;
+    if ((b[0] > 0) + (c[0] > 0) + (d[0] > 0) != 1) { // Not one suit
+        return false;
+    }
+    if (b[0]>0) {
+        arr = [...b];
+    } else if (c[0] > 0) {
+        arr = [...c];
+    } else {
+        arr = [...d];
+    }
+    
+    // Determine if the eyes are in the suit or in the honors
+    let honorEyes = null;
+    if ((h-2)%3 == 0) {
+        honorEyes = true;
+    } else {
+        honorEyes = false;
+    }
+
+    let numMelds = 0; // Need to find four melds
+    if (honorEyes) { // eyes are in the honors
+        let found = false;
+        h = [...h];
+        for (let i = 0; i < h.length; i += 1) {
+            if (h[i] == 2) {
+                found = true;
+                h[i] -= 2; // Remove the eyes
+                break;
+            }
+        }
+        if (!found) {
+            return false;
+        }
+        for (let i = 0; i < h.length; i += 1) {
+            numMelds += h[i]==3;
+        }
+        numMelds += countMelds(arr);
+        return numMelds == 4;
+    } else {
+        for (let i = 0; i < h.length; i += 1) { // Remove honor melds
+            numMelds += h[i]==3;
+        }
+        let possibleEyes = []; // Possible places for eyes
+        for (let i = 0; i < arr.length; i += 1) {
+            if (i >= 2) {
+                possibleEyes.push(i);
+            }
+        }
+        for (let k = 0; k < possibleEyes.length; k += 1) { // For each eye
+            let eye = possibleEyes[k];
+            arr[eye] -= 2; // Remove the eyes
+            if (numMelds + countMelds(arr) == 4) {
+                return true;
+            }
+            arr[eye] += 2; // Return the eyes
+        }
+    }
+    return false;
+}
+
+function checkAllTriplets (b, c, d, h) {
+    let foundEyes = false;
+    let numPong = 0;
+    if (b[0] > 0) {
+        for (let i = 0; i < b.length; i += 1) {
+            if (b[i] == 3) {
+                numPong += 1;
+            } else {
+                if (!foundEyes && b[i] == 2) {
+                    foundEyes = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    if (c[0] > 0) {
+        for (let i = 0; i < c.length; i += 1) {
+            if (c[i] == 3) {
+                numPong += 1;
+            } else {
+                if (!foundEyes && c[i] == 2) {
+                    foundEyes = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    if (d[0] > 0) {
+        for (let i = 0; i < d.length; i += 1) {
+            if (d[i] == 3) {
+                numPong += 1;
+            } else {
+                if (!foundEyes && d[i] == 2) {
+                    foundEyes = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    if (h[0] > 0) {
+        for (let i = 0; i < h.length; i += 1) {
+            if (h[i] == 3) {
+                numPong += 1;
+            } else {
+                if (!foundEyes && h[i] == 2) {
+                    foundEyes = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    return foundEyes && (numPong == 4);
+}
+
+/**
+ * Finds the number of straights
+ * @param {String[]} arr 
+ */
+function countStraightsHelper(arr, i) {
+    if (i == arr.length) {
+        return 0;
+    }
+    if (arr[i] == 0) {
+        return countStraightsHelper(arr, i+1);
+    }
+    if (arr[i + 1] >= 1 && arr[i + 2] >= 1) {
+        arr[i] -= 1;
+        arr[i+1] -= 1;
+        arr[i+2] -= 1;
+        return 1 + countStraightsHelper(arr, i); // Do not increment, could be more straights
+    } else {
+        return countStraightsHelper(arr, i+1);
+    }
+}
+
+function countStraights(arr) {
+    arr = [...arr];
+    return countStraightsHelper(arr, i);
+}
+
+function checkCommonHand(b, c, d, h) {
+    let eyesArr = null;
+    if ((b[0]-2)%3 == 0) {
+        eyesArr = [...b];
+    } else if ((c[0]-2)%3 == 0) {
+        eyesArr = [...c];
+    } else if ((d[0]-2)%3 == 0) {
+        eyesArr = [...d];
+    } else {
+        eyesArr = [...h];
+    }
+    let possibleEyes = [];
+    for (let i = 0; i < eyesArr; i += 1) {
+        if (eyesArr[i] >= 2) {
+            possibleEyes.push(i);
+        }
+    }
+    let numMelds = 0;
+    let found = false;
+    for (let k = 0; k < possibleEyes.length; i += 1) {
+        let eye = possibleEyes[k];
+        eyesArr[eye] -= 2; // Remove the eyes
+        let x = countStraights(eyesArr);
+        if (x * 3 + 2 == eyesArr[0]) { // All tiles used
+            numMelds += x;
+            found = true;
+            break;
+        }
+        arr[eye] += 2; // Return the eyes
+    }
+    if (!found) {
+        return false;
+    }
+
+    if (b[0]%3 == 0) {
+        numMelds += countStraights(b);
+    }
+    if (c[0]%3 == 0) {
+        numMelds += countStraights(b);
+    }
+    if (d[0]%3 == 0) {
+        numMelds += countStraights(b);
+    }
+    return numMelds == 4;
 }
 
 class Game {
