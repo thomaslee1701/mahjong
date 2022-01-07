@@ -76,9 +76,10 @@ function countMelds(arr) {
  * @param {String[]} h 
  */
 function checkNineGates(b, c, d, h) {
-    return (c[1] == 3 && c[2] == 1 && c[3] == 1 && c[4] == 1 && c[5] == 1 && c[6] == 1 
-                && c[7] == 1 && c[8] == 1 && c[9] == 9);
+    return (c[1] == 3 && c[2] >= 1 && c[3] >= 1 && c[4] >= 1 && c[5] >= 1 && c[6] >= 1 
+                && c[7] >= 1 && c[8] >= 1 && c[9] == 3);
 }
+
 function checkOrphans(b, c, d, h) {
     let arr = null;
     if ((b[0]-2)%3 == 0) { // eyes are in here or no eyes at all
@@ -108,6 +109,11 @@ function checkOrphans(b, c, d, h) {
     let y = d[1] == 3;
     let z = d[9] == 3;
     return u + v + w + x + y + z == 4; // four pongs of those types
+}
+
+function checkThirteenOrphans(b, c, d, h) {
+    return b[1] >= 1 && b[9] >= 1 && c[1] >= 1 && c[9] >= 1 && d[1] >= 1 && d[9] >= 1 && 
+            h[1] >= 1 && h[2] >= 1 && h[3] >= 1 && h[4] >= 1 && h[5] >= 1 && h[6] >= 1 && h[7] >= 1;
 }
 
 function checkGreatWinds(b, c, d, h) {
@@ -246,7 +252,7 @@ function checkSmallDragons(b, c, d, h) {
         eyesArr = [...h];
     }
     let possibleEyes = [];
-    for (let i = 0; i < eyesArr; i += 1) {
+    for (let i = 1; i < eyesArr; i += 1) {
         if (eyesArr[i] >= 2) {
             possibleEyes.push(i);
         }
@@ -280,6 +286,23 @@ function checkSmallDragons(b, c, d, h) {
     return numMelds == 2; // Found the two other melds
 }
 
+function checkAllHonors(b, c, d, h) {
+    let foundEyes = false;
+    let numPong = 0;
+    for (let i = 1; i < h.length; i += 1) {
+        if (h[i] == 3) {
+            numPong += 1;
+        } else {
+            if (!foundEyes && h[i] == 2) {
+                foundEyes = true;
+            } else {
+                return false;
+            }
+        }
+    }
+    return foundEyes && numPong == 4
+}
+
 function checkAllOneSuit(b, c, d, h) {
     let arr = null;
     if (b[0]==14) {
@@ -294,7 +317,7 @@ function checkAllOneSuit(b, c, d, h) {
     }
 
     let possibleEyes = [] // Possible places for eyes;
-    for (let i = 0; i < arr.length; i += 1) {
+    for (let i = 1; i < arr.length; i += 1) {
         if (i >= 2) {
             possibleEyes.push(i);
         }
@@ -336,7 +359,7 @@ function checkMixedOneSuit(b, c, d, h) {
     if (honorEyes) { // eyes are in the honors
         let found = false;
         h = [...h];
-        for (let i = 0; i < h.length; i += 1) {
+        for (let i = 1; i < h.length; i += 1) {
             if (h[i] == 2) {
                 found = true;
                 h[i] -= 2; // Remove the eyes
@@ -346,17 +369,17 @@ function checkMixedOneSuit(b, c, d, h) {
         if (!found) {
             return false;
         }
-        for (let i = 0; i < h.length; i += 1) {
+        for (let i = 1; i < h.length; i += 1) {
             numMelds += h[i]==3;
         }
         numMelds += countMelds(arr);
         return numMelds == 4;
     } else {
-        for (let i = 0; i < h.length; i += 1) { // Remove honor melds
+        for (let i = 1; i < h.length; i += 1) { // Remove honor melds
             numMelds += h[i]==3;
         }
         let possibleEyes = []; // Possible places for eyes
-        for (let i = 0; i < arr.length; i += 1) {
+        for (let i = 1; i < arr.length; i += 1) {
             if (i >= 2) {
                 possibleEyes.push(i);
             }
@@ -377,7 +400,7 @@ function checkAllTriplets (b, c, d, h) {
     let foundEyes = false;
     let numPong = 0;
     if (b[0] > 0) {
-        for (let i = 0; i < b.length; i += 1) {
+        for (let i = 1; i < b.length; i += 1) {
             if (b[i] == 3) {
                 numPong += 1;
             } else {
@@ -390,7 +413,7 @@ function checkAllTriplets (b, c, d, h) {
         }
     }
     if (c[0] > 0) {
-        for (let i = 0; i < c.length; i += 1) {
+        for (let i = 1; i < c.length; i += 1) {
             if (c[i] == 3) {
                 numPong += 1;
             } else {
@@ -403,7 +426,7 @@ function checkAllTriplets (b, c, d, h) {
         }
     }
     if (d[0] > 0) {
-        for (let i = 0; i < d.length; i += 1) {
+        for (let i = 1; i < d.length; i += 1) {
             if (d[i] == 3) {
                 numPong += 1;
             } else {
@@ -416,7 +439,7 @@ function checkAllTriplets (b, c, d, h) {
         }
     }
     if (h[0] > 0) {
-        for (let i = 0; i < h.length; i += 1) {
+        for (let i = 1; i < h.length; i += 1) {
             if (h[i] == 3) {
                 numPong += 1;
             } else {
@@ -469,7 +492,7 @@ function checkCommonHand(b, c, d, h) {
         eyesArr = [...h];
     }
     let possibleEyes = [];
-    for (let i = 0; i < eyesArr; i += 1) {
+    for (let i = 1; i < eyesArr; i += 1) {
         if (eyesArr[i] >= 2) {
             possibleEyes.push(i);
         }
@@ -583,6 +606,6 @@ export {
     NUM_TILES,
     countMelds,
     handToString,
-    checkNineGates, checkOrphans, checkTriplets, checkGreatWinds, checkSmallWinds16, checkSmallWinds9, checkGreatDragons, checkSmallDragons, checkAllOneSuit, checkMixedOneSuit, checkAllTriplets, checkCommonHand,
+    checkNineGates, checkOrphans, checkThirteenOrphans, checkGreatWinds, checkSmallWinds16, checkSmallWinds9, checkGreatDragons, checkSmallDragons, checkAllHonors, checkAllOneSuit, checkMixedOneSuit, checkAllTriplets, checkCommonHand,
     Game
 }
