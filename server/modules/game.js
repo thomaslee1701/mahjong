@@ -185,9 +185,6 @@ function checkSmallWinds9(b, c, d, h) {
     return numMelds == 1;
 }
 
-/**
- * CHECK THE DRAGONS
- */
 
 function checkGreatDragons(b, c, d, h) { 
     // Things to check: Three dragon melds, one meld, one pair of eyes 
@@ -246,47 +243,52 @@ function checkSmallDragons(b, c, d, h) {
         return false;
     }
 
-    /** Find eyes and remove them */
-    let arr = null;
+    let numMelds = 0; // Need two other melds
+    numMelds += (h[4] == 3) + (h[5] == 3) + (h[6] == 3) + (h[7] == 3); // If there are wind melds...
+
+    let eyesArr = null;
     if ((b[0]-2)%3 == 0) { // eyes are in here or no eyes at all
-        arr = [...b];
+        eyesArr = [...b];
     } else if ((c[0]-2)%3 == 0) {
-        arr = [...c];
+        eyesArr = [...c];
     } else if ((d[0]-2)%3 == 0) {
-        arr = [...d];
+        eyesArr = [...d];
     } else {
-        arr = [...h];
+        eyesArr = [...h];
     }
-    let found = false;
-    for (let i = 1; i < arr.length; i += 1) {
-        if (arr[i] == 2) {
-            found = true;
-            arr[0] -= 2;
-            arr[i] = 0; // REMOVE THE EYES!! Should only be one or two suits now.
-            break;
+    let possibleEyes = [];
+    for (let i = 0; i < eyesArr; i += 1) {
+        if (eyesArr[i] >= 2) {
+            possibleEyes.push(i);
         }
     }
-    if (!found) { // If unable to find the eyes
+    let numMelds = 0;
+    let found = false;
+    for (let k = 0; k < possibleEyes.length; i += 1) {
+        let eye = possibleEyes[k];
+        eyesArr[eye] -= 2; // Remove the eyes
+        let x = countMelds(eyesArr);
+        if (x * 3 + 2 == eyesArr[0]) { // All tiles used
+            numMelds += x;
+            found = true;
+            break;
+        }
+        arr[eye] += 2; // Return the eyes
+    }
+    if (!found) {
         return false;
     }
 
-    let otherMelds = 2; // Need two other melds
-    otherMelds -= (h[4] == 3) + (h[5] == 3) + (h[6] == 3) + (h[7] == 3); // If there are wind melds...
-
-    // Non-wind melds
-    if ((b[0] == 0) + (c[0] == 0) + (d[0] == 0) == 3) { // Three suits is impossible
-        return false;
-    }
-    if (b[0]>0) { // the meld must be in here
-        otherMelds -= countMelds(b);
+    if (b[0]>0 && b[0]%3==0) { // the meld must be in here
+        numMelds += countMelds(b);
     } 
-    if (c[0]>0) {
-        otherMelds -= countMelds(c);
+    if (c[0]>0 && c[0]%3==0) {
+        numMelds += countMelds(c);
     } 
-    if (d[0]>0) {
-        otherMelds -= countMelds(d);
+    if (d[0]>0 && d[0]%3==0) {
+        numMelds += countMelds(d);
     }
-    return otherMelds == 0; // Found the two other melds
+    return numMelds == 2; // Found the two other melds
 }
 
 function checkAllOneSuit(b, c, d, h) {
