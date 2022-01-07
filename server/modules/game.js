@@ -110,17 +110,6 @@ function checkOrphans(b, c, d, h) {
     return u + v + w + x + y + z == 4; // four pongs of those types
 }
 
-function checkTriplets(b, c, d, h) {
-    let numPong = 0;
-    for (let i=1; i < 10; i+=1) {
-        numPong += Math.floor(b[i]/3) + Math.floor(c[i]/3) + Math.floor(d[i]/3); // Works for kong too!
-    }
-    for (let i=1; i<honors.length; i+=1) {
-        numPong += Math.floor(h[i]);
-    }
-    return numPong == 4; // All pongs
-}
-
 function checkGreatWinds(b, c, d, h) {
     let w = h[4] == 3;
     let x = h[5] == 3;
@@ -594,5 +583,6 @@ export {
     NUM_TILES,
     countMelds,
     handToString,
+    checkNineGates, checkOrphans, checkTriplets, checkGreatWinds, checkSmallWinds16, checkSmallWinds9, checkGreatDragons, checkSmallDragons, checkAllOneSuit, checkMixedOneSuit, checkAllTriplets, checkCommonHand,
     Game
 }
