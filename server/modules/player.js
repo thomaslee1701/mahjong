@@ -7,7 +7,7 @@ import { sort } from './utils.js'
  *   The rest of the array store the frequencies for each of the tiles.
  * - ret['b'][1] gives the number of b1 tiles
  */
-function emptyHandTable() {
+ function emptyHandTable() {
     let ret = {};
     ret['b'] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     ret['c'] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -98,13 +98,8 @@ class Player {
         return this.handTable['d'];
     }
     getHonorsArray() {
-        return this.handTable['honor'][0];
+        return this.handTable['honor'];
     }
-
-
-    
-
-
 }
 
 export {
